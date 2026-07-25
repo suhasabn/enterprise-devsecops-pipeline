@@ -1,6 +1,14 @@
 pipeline {
     agent any
 
+    tools {
+        maven 'Maven3'
+    }
+
+    options {
+        timestamps()
+    }
+
     stages {
 
         stage('Checkout') {
@@ -9,9 +17,21 @@ pipeline {
             }
         }
 
-        stage('Build') {
+        stage('Compile') {
             steps {
-                sh 'mvn clean package'
+                sh 'mvn clean compile'
+            }
+        }
+
+        stage('Unit Tests') {
+            steps {
+                sh 'mvn test'
+            }
+        }
+
+        stage('Package') {
+            steps {
+                sh 'mvn package -DskipTests'
             }
         }
 
@@ -23,11 +43,16 @@ pipeline {
     }
 
     post {
-        success {
-            echo 'Build completed successfully!'
+        always {
+            junit 'target/surefire-reports/*.xml'
         }
+
+        success {
+            echo 'Pipeline executed successfully!'
+        }
+
         failure {
-            echo 'Build failed!'
+            echo 'Pipeline failed!'
         }
     }
 }
