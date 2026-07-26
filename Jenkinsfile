@@ -91,6 +91,7 @@ pipeline {
                 archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
                 archiveArtifacts artifacts: 'trivy-fs-report.txt', fingerprint: true            
         }
+      }
     }
 
     post {
