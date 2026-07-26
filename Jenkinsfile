@@ -17,35 +17,32 @@ pipeline {
             }
         }
 
-        stage('Compile') {
+        stage('Build, Test & Coverage') {
             steps {
-                sh 'mvn clean compile'
+                sh 'mvn clean verify'
             }
         }
 
-        stage('Unit Tests') {
-            steps {
-                sh 'mvn test'
-            }
-        }
         stage('Publish JaCoCo Report') {
-           steps {
-              publishHTML(target: [
-                allowMissing: false,
-                alwaysLinkToLastBuild: true,
-                keepAll: true,
-                reportDir: 'target/site/jacoco',
-                reportFiles: 'index.html',
-                reportName: 'JaCoCo Coverage Report'
-             ])
-           }
-        }     
-        stage('Package') {
             steps {
-                sh 'mvn package -DskipTests'
+                sh '''
+                    echo "===== Checking JaCoCo Report ====="
+                    ls -la target || true
+                    ls -la target/site || true
+                    ls -la target/site/jacoco || true
+                '''
+
+                publishHTML(target: [
+                    allowMissing: false,
+                    alwaysLinkToLastBuild: true,
+                    keepAll: true,
+                    reportDir: 'target/site/jacoco',
+                    reportFiles: 'index.html',
+                    reportName: 'JaCoCo Coverage Report'
+                ])
             }
         }
-        
+
         stage('Archive Artifact') {
             steps {
                 archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
