@@ -62,12 +62,34 @@ pipeline {
                     archiveArtifacts artifacts: 'target/classes/META-INF/sbom/*', fingerprint: true
              }
         } 
-
         
+
+        stage('Trivy Filesystem Scan') {
+                steps {
+                   sh '''
+                    trivy fs \
+                    --format table \
+                    --output trivy-fs-report.txt \
+                      .
+               '''
+            }
+        }
+
+
+
+
+ 
+           
+
+
+
+
+
+
         stage('Archive Artifact') {
             steps {
                 archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
-            }
+                archiveArtifacts artifacts: 'trivy-fs-report.txt', fingerprint: true            
         }
     }
 
