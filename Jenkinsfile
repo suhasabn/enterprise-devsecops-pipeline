@@ -56,7 +56,14 @@ pipeline {
                 }
             }
         }
+        
+        stage('Archive SBOM') {
+              steps {
+                    archiveArtifacts artifacts: 'target/classes/META-INF/sbom/*', fingerprint: true
+             }
+        } 
 
+        
         stage('Archive Artifact') {
             steps {
                 archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
